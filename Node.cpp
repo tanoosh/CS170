@@ -1,24 +1,26 @@
 #include "node.h"
 
+//i am pretty sure this constructor is useless, but i made it at some point for some reason and am now too scared to remove it
 Node::Node(){
 	g_cost = 1;
 	h_cost = 0;
 	my_parent = NULL;
 }
 
-	
 
 Node::Node(Puzzle p, Node* parent, int h){
 	my_puzzle = p;
 	my_parent = parent;
 	heuristic_type = h;
 
+	//if parent is NULL, then is source node, so depth is 0, otherwise, add 1 to the depth of the parent
 	if (parent != nullptr) {
 		g_cost = parent->get_g() + 1;
 	} else {
-		g_cost = 1;
+		g_cost = 0;
 	}
 
+	//calculate heuristic based off of initial user input h
 	switch(h){
 		case 1: 
 			h_cost = my_puzzle.manhattan_distance();
@@ -30,6 +32,7 @@ Node::Node(Puzzle p, Node* parent, int h){
 	}
 }
 	
+//returns if puzzle is goal
 bool Node::is_goal() const {
 	return my_puzzle.is_goal();
 }
@@ -56,10 +59,13 @@ int Node::get_heur_type() const {
 	return heuristic_type;
 }
 
+//a node is "less than" another if the value of their total heuristic cost (g(n) + h(n)) is greater.
 bool Node::operator<(const Node rhs){
 	return (get_g() + get_h()) > (rhs.get_g()+rhs.get_h());
 }
-bool Node::operator==(const Node rhs){
+
+//a node equals another if their puzzles are the same
+bool Node::operator==(const Node rhs){ 
 	return my_puzzle == rhs.get_puzzle();	
 }
 Node Node::operator= (const Node rhs){
@@ -72,6 +78,7 @@ Node Node::operator= (const Node rhs){
 	return *this;
 }
 
+//create a child node with the blank tile moved up one (if possible)
 void Node::add_move_up(){
 	Puzzle up = my_puzzle.move_up();
 	if (up != my_puzzle){	
@@ -80,6 +87,7 @@ void Node::add_move_up(){
 	}
 }
 
+//create a child node with the blank tile moved down one (if possible)
 void Node::add_move_down(){
 	Puzzle down = my_puzzle.move_down();
 	if (down != my_puzzle){
@@ -88,6 +96,7 @@ void Node::add_move_down(){
 	}
 }
 
+//create a child node with the blank tile moved left one (if possible)
 void Node::add_move_left(){
 	Puzzle left = my_puzzle.move_left();
 	if (left != my_puzzle){
@@ -96,6 +105,7 @@ void Node::add_move_left(){
 	}
 }
 
+//create a child node with the blank tile moved right one (if possible)
 void Node::add_move_right(){
 	Puzzle right = my_puzzle.move_right();
 	if (right != my_puzzle){
@@ -104,6 +114,7 @@ void Node::add_move_right(){
 	}
 }
 
+//create all possible children
 void Node::expand(){
 	add_move_up();
 	add_move_down();
@@ -115,12 +126,3 @@ void Node::print() const {
 	my_puzzle.print();
 	std::cout << "Heuristic: " << g_cost << " + " << h_cost << std::endl; 
 }
-/*
-friend std::ostream& operator<<(std::ostream& os, Node const& n){
-	std::string s;
-	s << n.my_puzzle;
-	s << "Heuristic: " << n.g_cost << " + " << n.h_cost << "\n";
-	return os << s; 
-
-}
-*/
