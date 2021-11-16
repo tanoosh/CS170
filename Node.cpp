@@ -115,3 +115,12 @@ void Node::print() const {
 	my_puzzle.print();
 	std::cout << "Heuristic: " << g_cost << " + " << h_cost << std::endl; 
 }
+/*
+friend std::ostream& operator<<(std::ostream& os, Node const& n){
+	std::string s;
+	s << n.my_puzzle;
+	s << "Heuristic: " << n.g_cost << " + " << n.h_cost << "\n";
+	return os << s; 
+
+}
+*/

@@ -2,6 +2,8 @@
 #define _PUZZLE_H__
 
 #include <vector>
+#include <iostream>
+#include <string>
 
 class Puzzle {
 private:
@@ -16,6 +18,7 @@ public:
 	int get_row(int val) const;
 	int get_col(int val) const;
 	int get_size() const {return my_size;};
+	//friend std::ostream& operator<<(std::ostream& os, Puzzle const& p);
 	void print() const;
 
 	int manhattan_distance() const;

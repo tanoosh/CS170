@@ -1,4 +1,8 @@
 #include <iostream> 
+#include <fstream>
+#include <chrono>
+#include <cmath>
+#include <time.h>
 #include <vector>
 #include <queue>
 #include "Puzzle.h"
@@ -20,6 +24,7 @@ bool contains(Node node, std::vector<Node> nodes){
 	}
 	return false;
 }
+
 
 int main(){
 	int puzzle_type;
@@ -59,50 +64,54 @@ int main(){
 	Node source(puzzle, NULL, heuristic);
 	std::vector <Puzzle> check;
 
+	int max_queue_size = 1;
+	int num_nodes_expanded = 0;
+	int depth;
+	clock_t t;
+
+	//create fringe and visited list (also a vector of all visited puzzles bc i don't know how else to check)
 	std::priority_queue<Node, std::vector<Node>, Compare> fringe;
 	std::queue<Node> visited; 
 	std::vector<Node> all;
 
 	fringe.push(source);
 	all.push_back(source);
-	/*
-
-	std::vector<int> v1 {1,2,3,4,5,6,7,8,0};
-	std::vector<int> v2 {1,6,7,5,0,3,4,8,2};
-	std::vector<int> v3 {1,2,3,0,4,6,7,5,8};
-	std::vector<int> v4 {1,2,3,4,5,6,0,7,8};
-
-	Puzzle p1(v1); Node n1(p1, NULL, 1);
-	Puzzle p2(v2); Node n2(p2, NULL, 1);
-	Puzzle p3(v3); Node n3(p3, NULL, 1);
-	Puzzle p4(v4); Node n4(p4, NULL, 1);
-
-	fringe.push(n1); fringe.push(n2); fringe.push(n3);
-
-	while(!fringe.empty()){
-		(fringe.top()).print();
-		fringe.pop();
-	}
-	*/
+	
 	if (source.is_goal()){
-		std::cout<<"initial success!" << std::endl;
+		std::cout<< "This is already the goal state, silly billy" << std::endl;
+		return 1;
 	}
+
 	/**************Search**************/
-	while(!fringe.empty()){
+	t = clock();
+	auto begin = std::chrono::high_resolution_clock::now();	
+
+	//while fringe is not empty & less than 5 minutes has elapsed (i do not have the patience to run this program for longer than that) 
+	while(!fringe.empty()  &&  ((float)t/CLOCKS_PER_SEC)<300) {
 		//pop min node
 		Node temp = fringe.top();
 		fringe.pop();
+			//write to file
+		std::cout << "The best node to expand: \n";
 		temp.print();
 
 		visited.push(temp); //add node to vistied list
 
+		//expand min node
 		temp.expand();
+		num_nodes_expanded++;	
+
 		std::list<Node> expansion = temp.get_children();
 		for (std::list<Node>::iterator it = expansion.begin(); it != expansion.end(); ++it){
-			if (it->is_goal()){
-				//success and traceback	
+			//if one of the children is goal, success!
+			if (it->is_goal()){ 
+				auto end = std::chrono::high_resolution_clock::now();
+				t = clock() - t;
+
 				std::cout<<"Success!" << std::endl;							
-				//traceback
+				depth = it->get_g();	
+				std::cout <<"Depth: " << depth << ", Max Queue Size: " << max_queue_size << ", Number of Nodes Expanded: " << num_nodes_expanded << std::endl;
+				std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count() << " ns, " << (float)t/CLOCKS_PER_SEC << " s" << std::endl;
 				return 1;
 			}
 			else {
@@ -114,10 +123,14 @@ int main(){
 			}
 
 		}
+		int k = fringe.size();
+		max_queue_size = std::max(k, max_queue_size);
 	}
 
-	//failure
-
+	std::cout << "Could not find a solution, sorry :((" << std::endl;
+	std::cout <<"Depth: " << depth << ", Max Queue Size: " << max_queue_size << ", Number of Nodes Expanded: " << num_nodes_expanded << std::endl;
+	std::cout <<"Time: " << ((float)t)/CLOCKS_PER_SEC << std::endl;
+				
 }
 
 

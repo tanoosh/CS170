@@ -196,6 +196,20 @@ void Puzzle::print() const {
 	}
 }
 
+/*
+friend std::ostream& operator<<(std::ostream& os, Puzzle const& p){
+	std::string s;
+	for (int r = 0; r<p.my_size; r++){
+		s << "[";
+		for (int c = 0; c<p.my_size; c++){
+			s<< p.matrix[r][c] << ", "; 	
+		}
+		s << "] \n"; 
+	}
+	return os << s;
+}
+*/
+
 bool Puzzle::is_goal() const {
 	return (this->manhattan_distance() == 0);
 }

@@ -2,6 +2,7 @@
 #define __NODE_H__
 
 #include <list>
+#include <string>
 #include "puzzle.h"
 #include <iterator>
 #include <iostream>
@@ -35,6 +36,7 @@ class Node {
 
 		bool is_goal() const;
 		void print() const;
+//		friend std::ostream& operator<<(std::ostream& os, Node const& n);
 
 		bool operator<(const Node rhs);
 		bool operator==(const Node rhs);
